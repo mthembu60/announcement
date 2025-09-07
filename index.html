@@ -575,7 +575,7 @@
             });
         });
 
-        // Poll functionality
+        // Poll functionality - using a simple shared storage approach
         let pollVotes = {
             boy: 0,
             girl: 0
@@ -586,9 +586,13 @@
             girl: []
         };
 
+        // Simple shared storage using a unique key for this poll
+        const POLL_KEY = 'baby_poll_2026';
+        const VOTERS_KEY = 'baby_voters_2026';
+
         function vote(gender) {
             // Check if user has already voted
-            if (localStorage.getItem('hasVoted')) {
+            if (localStorage.getItem('hasVoted_' + POLL_KEY)) {
                 alert('You have already voted! Thank you for participating! 🎉');
                 return;
             }
@@ -600,14 +604,17 @@
                 return;
             }
 
+            // Load current data
+            loadPollData();
+
             // Add vote and voter
             pollVotes[gender]++;
             voters[gender].push(voterName);
             
-            // Store in localStorage
-            localStorage.setItem('pollVotes', JSON.stringify(pollVotes));
-            localStorage.setItem('voters', JSON.stringify(voters));
-            localStorage.setItem('hasVoted', 'true');
+            // Store in localStorage with unique keys
+            localStorage.setItem(POLL_KEY, JSON.stringify(pollVotes));
+            localStorage.setItem(VOTERS_KEY, JSON.stringify(voters));
+            localStorage.setItem('hasVoted_' + POLL_KEY, 'true');
             
             // Update UI
             updatePollResults();
@@ -625,6 +632,20 @@
             });
             document.getElementById('voterName').disabled = true;
             document.getElementById('voterName').style.opacity = '0.7';
+        }
+
+        function loadPollData() {
+            // Load votes
+            const savedVotes = localStorage.getItem(POLL_KEY);
+            if (savedVotes) {
+                pollVotes = JSON.parse(savedVotes);
+            }
+
+            // Load voters
+            const savedVoters = localStorage.getItem(VOTERS_KEY);
+            if (savedVoters) {
+                voters = JSON.parse(savedVoters);
+            }
         }
 
         function updatePollResults() {
@@ -677,21 +698,12 @@
 
         // Load poll data on page load
         document.addEventListener('DOMContentLoaded', function() {
-            const savedVotes = localStorage.getItem('pollVotes');
-            const savedVoters = localStorage.getItem('voters');
-            
-            if (savedVotes) {
-                pollVotes = JSON.parse(savedVotes);
-                updatePollResults();
-            }
-            
-            if (savedVoters) {
-                voters = JSON.parse(savedVoters);
-                updateVotersList();
-            }
+            loadPollData();
+            updatePollResults();
+            updateVotersList();
             
             // If user has voted, disable buttons and input
-            if (localStorage.getItem('hasVoted')) {
+            if (localStorage.getItem('hasVoted_' + POLL_KEY)) {
                 document.querySelectorAll('.poll-option').forEach(btn => {
                     btn.disabled = true;
                     btn.style.opacity = '0.7';
@@ -700,6 +712,13 @@
                 document.getElementById('voterName').style.opacity = '0.7';
             }
         });
+
+        // Refresh poll data every 5 seconds to show new votes
+        setInterval(function() {
+            loadPollData();
+            updatePollResults();
+            updateVotersList();
+        }, 5000);
 
         // Add pulse animation
         const style = document.createElement('style');
