@@ -468,10 +468,10 @@
             <div class="poll-form">
                 <input type="text" class="poll-input" id="voterName" placeholder="Enter your name here..." maxlength="20">
                 <div class="poll-options">
-                    <button class="poll-option" onclick="vote('boy')">
+                    <button class="poll-option" id="boyButton">
                         👶 It's a Boy! 💙
                     </button>
-                    <button class="poll-option" onclick="vote('girl')">
+                    <button class="poll-option" id="girlButton">
                         👶 It's a Girl! 💗
                     </button>
                 </div>
@@ -575,7 +575,7 @@
             });
         });
 
-        // Poll functionality - using a simple shared storage approach
+        // Poll functionality - using JSONBin for shared storage
         let pollVotes = {
             boy: 0,
             girl: 0
@@ -586,11 +586,17 @@
             girl: []
         };
 
-        // Simple shared storage using a unique key for this poll
+        // JSONBin configuration for shared storage
+        const JSONBIN_API_KEY = '$2a$10$cK0flT4I18MRRHdXDdmdaO7BXWaOjcoMMWe4FEVe1/l2ybaOENExO'; // You'll need to get this from jsonbin.io
+        const JSONBIN_BIN_ID = '68bd7d64ae596e708fe5b36d'; // You'll need to create a bin and get this ID
+        const POLL_URL = `https://api.jsonbin.io/v3/b/68bd7d64ae596e708fe5b36d/latest`;
+        const UPDATE_URL = `https://api.jsonbin.io/v3/b/68bd7d64ae596e708fe5b36d`;
+
+        // Fallback to localStorage if JSONBin is not configured
         const POLL_KEY = 'baby_poll_2026';
         const VOTERS_KEY = 'baby_voters_2026';
 
-        function vote(gender) {
+        async function vote(gender) {
             // Check if user has already voted
             if (localStorage.getItem('hasVoted_' + POLL_KEY)) {
                 alert('You have already voted! Thank you for participating! 🎉');
@@ -605,15 +611,20 @@
             }
 
             // Load current data
-            loadPollData();
+            await loadPollData();
 
             // Add vote and voter
             pollVotes[gender]++;
             voters[gender].push(voterName);
             
-            // Store in localStorage with unique keys
-            localStorage.setItem(POLL_KEY, JSON.stringify(pollVotes));
-            localStorage.setItem(VOTERS_KEY, JSON.stringify(voters));
+            // Try to save to JSONBin first, fallback to localStorage
+            const success = await savePollData();
+            if (!success) {
+                // Fallback to localStorage
+                localStorage.setItem(POLL_KEY, JSON.stringify(pollVotes));
+                localStorage.setItem(VOTERS_KEY, JSON.stringify(voters));
+            }
+            
             localStorage.setItem('hasVoted_' + POLL_KEY, 'true');
             
             // Update UI
@@ -634,18 +645,61 @@
             document.getElementById('voterName').style.opacity = '0.7';
         }
 
-        function loadPollData() {
-            // Load votes
+        async function loadPollData() {
+            try {
+                // Try to load from JSONBin first
+                if (JSONBIN_API_KEY !== 'YOUR_JSONBIN_API_KEY' && JSONBIN_BIN_ID !== 'YOUR_BIN_ID') {
+                    const response = await fetch(POLL_URL, {
+                        headers: {
+                            'X-Master-Key': JSONBIN_API_KEY
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.record) {
+                            pollVotes = data.record.votes || { boy: 0, girl: 0 };
+                            voters = data.record.voters || { boy: [], girl: [] };
+                            return;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('JSONBin not available, using localStorage');
+            }
+
+            // Fallback to localStorage
             const savedVotes = localStorage.getItem(POLL_KEY);
             if (savedVotes) {
                 pollVotes = JSON.parse(savedVotes);
             }
 
-            // Load voters
             const savedVoters = localStorage.getItem(VOTERS_KEY);
             if (savedVoters) {
                 voters = JSON.parse(savedVoters);
             }
+        }
+
+        async function savePollData() {
+            try {
+                if (JSONBIN_API_KEY !== 'YOUR_JSONBIN_API_KEY' && JSONBIN_BIN_ID !== 'YOUR_BIN_ID') {
+                    const response = await fetch(UPDATE_URL, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': JSONBIN_API_KEY
+                        },
+                        body: JSON.stringify({
+                            votes: pollVotes,
+                            voters: voters
+                        })
+                    });
+                    return response.ok;
+                }
+            } catch (error) {
+                console.log('JSONBin save failed, using localStorage');
+            }
+            return false;
         }
 
         function updatePollResults() {
@@ -697,25 +751,43 @@
         }
 
         // Load poll data on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadPollData();
+        document.addEventListener('DOMContentLoaded', async function() {
+            await loadPollData();
             updatePollResults();
             updateVotersList();
             
-            // If user has voted, disable buttons and input
-            if (localStorage.getItem('hasVoted_' + POLL_KEY)) {
+            // Add event listeners to buttons
+            document.getElementById('boyButton').addEventListener('click', function() {
+                vote('boy');
+            });
+            
+            document.getElementById('girlButton').addEventListener('click', function() {
+                vote('girl');
+            });
+            
+            // Check if user has voted and disable accordingly
+            const hasVoted = localStorage.getItem('hasVoted_' + POLL_KEY);
+            console.log('Has voted:', hasVoted); // Debug log
+            
+            if (hasVoted === 'true') {
                 document.querySelectorAll('.poll-option').forEach(btn => {
                     btn.disabled = true;
                     btn.style.opacity = '0.7';
                 });
                 document.getElementById('voterName').disabled = true;
                 document.getElementById('voterName').style.opacity = '0.7';
+                console.log('Input disabled because user has voted'); // Debug log
+            } else {
+                console.log('Input should be enabled'); // Debug log
+                // Ensure input is enabled
+                document.getElementById('voterName').disabled = false;
+                document.getElementById('voterName').style.opacity = '1';
             }
         });
 
         // Refresh poll data every 5 seconds to show new votes
-        setInterval(function() {
-            loadPollData();
+        setInterval(async function() {
+            await loadPollData();
             updatePollResults();
             updateVotersList();
         }, 5000);
@@ -730,6 +802,21 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Debug function to clear vote status (for testing)
+        function clearVoteStatus() {
+            localStorage.removeItem('hasVoted_' + POLL_KEY);
+            location.reload();
+        }
+
+        // Add clear button for testing (remove this in production)
+        // document.addEventListener('DOMContentLoaded', function() {
+        //     const clearButton = document.createElement('button');
+        //     clearButton.textContent = 'Clear Vote Status (Debug)';
+        //     clearButton.style.cssText = 'position: fixed; top: 10px; right: 10px; z-index: 1000; background: #ff6b6b; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer;';
+        //     clearButton.onclick = clearVoteStatus;
+        //     document.body.appendChild(clearButton);
+        // });
     </script>
 </body>
 </html>
