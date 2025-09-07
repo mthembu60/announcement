@@ -52,51 +52,6 @@
             backdrop-filter: blur(10px);
         }
 
-        .countdown-container {
-            background: linear-gradient(45deg, #e6f3ff, #ffeef8, #f0f8ff);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-            margin: 30px 0;
-            box-shadow: 0 8px 32px rgba(135, 206, 250, 0.2);
-            border: 2px solid rgba(135, 206, 250, 0.3);
-        }
-
-        .countdown-title {
-            font-size: 2rem;
-            color: #4a90e2;
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
-
-        .countdown {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .countdown-item {
-            background: linear-gradient(45deg, #87ceeb, #ffb6c1, #add8e6, #ffc0cb);
-            padding: 20px;
-            border-radius: 15px;
-            min-width: 100px;
-            box-shadow: 0 4px 15px rgba(135, 206, 235, 0.3);
-        }
-
-        .countdown-number {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #fff;
-            display: block;
-        }
-
-        .countdown-label {
-            font-size: 1rem;
-            color: #fff;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
 
         .ultrasound-section {
             background: linear-gradient(45deg, #e6f3ff, #f8f0ff, #fff0f8, #f0f8ff);
@@ -398,22 +353,72 @@
             100% { transform: scale(1); }
         }
 
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+
+        @keyframes wiggle {
+            0%, 7%, 14%, 21%, 28%, 35%, 42%, 49%, 56%, 63%, 70%, 77%, 84%, 91%, 98% { transform: rotate(0deg); }
+            3.5%, 10.5%, 17.5%, 24.5%, 31.5%, 38.5%, 45.5%, 52.5%, 59.5%, 66.5%, 73.5%, 80.5%, 87.5%, 94.5% { transform: rotate(3deg); }
+        }
+
+        @keyframes sparkle {
+            0%, 100% { opacity: 0; transform: scale(0); }
+            50% { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInScale {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .bouncing {
+            animation: bounce 2s infinite;
+        }
+
+        .wiggling {
+            animation: wiggle 0.5s ease-in-out;
+        }
+
+        .sparkle {
+            position: relative;
+        }
+
+        .sparkle::before {
+            content: "✨";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            animation: sparkle 2s infinite;
+        }
+
+        .slide-in {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        .fade-in-scale {
+            animation: fadeInScale 0.6s ease-out;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 2.5rem;
-            }
-            
-            .countdown {
-                gap: 10px;
-            }
-            
-            .countdown-item {
-                min-width: 80px;
-                padding: 15px;
-            }
-            
-            .countdown-number {
-                font-size: 2rem;
             }
             
             .ultrasound-image {
@@ -425,53 +430,32 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>We're Expecting! 👶</h1>
-            <div class="due-date">Due Date: February 2026</div>
+        <header class="slide-in">
+            <h1 class="floating sparkle">We're Expecting! 👶</h1>
+            <div class="due-date bouncing">Due Date: February 2026</div>
         </header>
 
-        <div class="countdown-container">
-            <h2 class="countdown-title">Countdown to Baby's Arrival</h2>
-            <div class="countdown" id="countdown">
-                <div class="countdown-item">
-                    <span class="countdown-number" id="days">0</span>
-                    <span class="countdown-label">Days</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="hours">0</span>
-                    <span class="countdown-label">Hours</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="minutes">0</span>
-                    <span class="countdown-label">Minutes</span>
-                </div>
-                <div class="countdown-item">
-                    <span class="countdown-number" id="seconds">0</span>
-                    <span class="countdown-label">Seconds</span>
-                </div>
-            </div>
-        </div>
 
-        <div class="ultrasound-section">
-            <h2 class="ultrasound-title">Our Little Blessing</h2>
-            <div class="ultrasound-image">
+        <div class="ultrasound-section fade-in-scale">
+            <h2 class="ultrasound-title floating">Our Little Blessing</h2>
+            <div class="ultrasound-image floating">
                 <img src="ultrasound.png" alt="Our little blessing's ultrasound" />
             </div>
-            <p style="color: #4a90e2; font-size: 1.1rem; margin-top: 15px;">
+            <p style="color: #4a90e2; font-size: 1.1rem; margin-top: 15px;" class="bouncing">
                 Our precious little one growing strong and healthy! 💕
             </p>
         </div>
 
-        <div class="poll-section">
-            <h2 class="poll-title">What's Your Guess? 🤔</h2>
-            <p class="poll-subtitle">Help us predict the gender of our little one!</p>
+        <div class="poll-section slide-in">
+            <h2 class="poll-title floating">What's Your Guess? 🤔</h2>
+            <p class="poll-subtitle bouncing">Help us predict the gender of our little one!</p>
             <div class="poll-form">
-                <input type="text" class="poll-input" id="voterName" placeholder="Enter your name here..." maxlength="20">
+                <input type="text" class="poll-input fade-in-scale" id="voterName" placeholder="Enter your name here..." maxlength="20">
                 <div class="poll-options">
-                    <button class="poll-option" id="boyButton">
+                    <button class="poll-option floating" id="boyButton">
                         👶 It's a Boy! 💙
                     </button>
-                    <button class="poll-option" id="girlButton">
+                    <button class="poll-option floating" id="girlButton">
                         👶 It's a Girl! 💗
                     </button>
                 </div>
@@ -507,9 +491,9 @@
             </div>
         </div>
 
-        <div class="baby-message">
-            <h2>Our Journey to Parenthood</h2>
-            <p>
+        <div class="baby-message slide-in">
+            <h2 class="floating">Our Journey to Parenthood</h2>
+            <p class="bouncing">
                 We are overjoyed to share that our family is growing! 
                 This little blessing has already brought so much love and excitement into our lives. 
                 We can't wait to meet our precious baby and watch them grow, learn, and discover the world. 
@@ -517,54 +501,15 @@
             </p>
         </div>
 
-        <footer>
-            <p>Made with <span class="heart">💛</span> by Mom & Dad</p>
+        <footer class="fade-in-scale">
+            <p class="floating">Made with <span class="heart">💛</span> by Mom & Dad</p>
         </footer>
     </div>
 
     <script>
-        // Set the due date (February 28, 2026)
-        const dueDate = new Date('February 1, 2026 00:00:00').getTime();
-
-        function updateCountdown() {
-            const now = new Date().getTime();
-            const timeLeft = dueDate - now;
-
-            if (timeLeft > 0) {
-                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-                document.getElementById('days').textContent = days;
-                document.getElementById('hours').textContent = hours;
-                document.getElementById('minutes').textContent = minutes;
-                document.getElementById('seconds').textContent = seconds;
-            } else {
-                // Baby has arrived!
-                document.getElementById('countdown').innerHTML = 
-                    '<div style="font-size: 2rem; color: #ff69b4; font-weight: bold;">🎉 Baby has arrived! 🎉</div>';
-            }
-        }
-
-        // Update countdown immediately and then every second
-        updateCountdown();
-        setInterval(updateCountdown, 1000);
 
         // Add some interactive effects
         document.addEventListener('DOMContentLoaded', function() {
-            // Add hover effects to countdown items
-            const countdownItems = document.querySelectorAll('.countdown-item');
-            countdownItems.forEach(item => {
-                item.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.05)';
-                    this.style.transition = 'transform 0.3s ease';
-                });
-                item.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(1)';
-                });
-            });
-
             // Add click effect to ultrasound image
             const ultrasoundImage = document.querySelector('.ultrasound-image');
             ultrasoundImage.addEventListener('click', function() {
@@ -573,7 +518,147 @@
                     this.style.animation = '';
                 }, 600);
             });
+
+            // Add random floating sparkles
+            createFloatingSparkles();
+
+            // Add hover effects to poll buttons
+            const pollButtons = document.querySelectorAll('.poll-option');
+            pollButtons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.classList.add('wiggling');
+                    setTimeout(() => {
+                        this.classList.remove('wiggling');
+                    }, 500);
+                });
+            });
+
+            // Add typing animation to input placeholder
+            animatePlaceholder();
+
+            // Add scroll-triggered animations
+            addScrollAnimations();
+
+            // Add confetti effect on vote
+            setupConfettiEffect();
         });
+
+        // Create floating sparkles animation
+        function createFloatingSparkles() {
+            const sparkles = ['✨', '⭐', '💫', '🌟', '💖', '💕'];
+            const container = document.querySelector('.container');
+            
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance every interval
+                    const sparkle = document.createElement('div');
+                    sparkle.textContent = sparkles[Math.floor(Math.random() * sparkles.length)];
+                    sparkle.style.cssText = `
+                        position: fixed;
+                        top: ${Math.random() * window.innerHeight}px;
+                        left: ${Math.random() * window.innerWidth}px;
+                        font-size: ${Math.random() * 20 + 15}px;
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: sparkle 3s ease-out forwards;
+                    `;
+                    container.appendChild(sparkle);
+                    
+                    setTimeout(() => {
+                        sparkle.remove();
+                    }, 3000);
+                }
+            }, 2000);
+        }
+
+        // Animate input placeholder text
+        function animatePlaceholder() {
+            const input = document.getElementById('voterName');
+            const placeholders = [
+                'Enter your name here...',
+                'What should we call you?',
+                'Your name please! 😊',
+                'Who are you? 👀',
+                'Tell us your name! 💕'
+            ];
+            let currentIndex = 0;
+            
+            setInterval(() => {
+                if (document.activeElement !== input) {
+                    input.placeholder = placeholders[currentIndex];
+                    currentIndex = (currentIndex + 1) % placeholders.length;
+                }
+            }, 3000);
+        }
+
+        // Add scroll-triggered animations
+        function addScrollAnimations() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animationPlayState = 'running';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.slide-in, .fade-in-scale').forEach(el => {
+                el.style.animationPlayState = 'paused';
+                observer.observe(el);
+            });
+        }
+
+        // Setup confetti effect for voting
+        function setupConfettiEffect() {
+            const pollButtons = document.querySelectorAll('.poll-option');
+            pollButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    createConfetti();
+                });
+            });
+        }
+
+        // Create confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#feca57', '#ff9ff3'];
+            const confettiCount = 50;
+            
+            for (let i = 0; i < confettiCount; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.cssText = `
+                        position: fixed;
+                        top: -10px;
+                        left: ${Math.random() * window.innerWidth}px;
+                        width: 10px;
+                        height: 10px;
+                        background: ${colors[Math.floor(Math.random() * colors.length)]};
+                        pointer-events: none;
+                        z-index: 1000;
+                        animation: confettiFall 3s linear forwards;
+                    `;
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => {
+                        confetti.remove();
+                    }, 3000);
+                }, i * 20);
+            }
+        }
+
+        // Add confetti fall animation
+        const confettiStyle = document.createElement('style');
+        confettiStyle.textContent = `
+            @keyframes confettiFall {
+                0% {
+                    transform: translateY(-100vh) rotate(0deg);
+                    opacity: 1;
+                }
+                100% {
+                    transform: translateY(100vh) rotate(720deg);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(confettiStyle);
 
         // Poll functionality - using JSONBin for shared storage
         let pollVotes = {
